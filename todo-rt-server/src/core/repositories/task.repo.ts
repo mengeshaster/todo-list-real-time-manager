@@ -4,7 +4,7 @@ import { UserRepo } from "./user.repo";
 export interface CreateTaskData {
     title: string;
     description?: string;
-    priority?: "low" | "med" | "high";
+    priority?: "low" | "medium" | "high";
     dueDate?: Date;
     createdBy?: string;
 }
@@ -13,7 +13,7 @@ export interface UpdateTaskData {
     title?: string;
     description?: string;
     status?: "open" | "done";
-    priority?: "low" | "med" | "high";
+    priority?: "low" | "medium" | "high";
     dueDate?: Date;
     updatedBy?: string;
 }
@@ -126,12 +126,12 @@ export const TaskRepo = {
         return await transformTask(tasks);
     },
 
-    findByPriority: async (priority: "low" | "med" | "high"): Promise<TaskDoc[]> => {
+    findByPriority: async (priority: "low" | "medium" | "high"): Promise<TaskDoc[]> => {
         const tasks = await Task.find({ priority }).sort({ createdAt: -1 }).lean();
         return await transformTask(tasks);
     },
 
-    findByPriorityAndUser: async (priority: "low" | "med" | "high", userId: string): Promise<TaskDoc[]> => {
+    findByPriorityAndUser: async (priority: "low" | "medium" | "high", userId: string): Promise<TaskDoc[]> => {
         const tasks = await Task.find({ priority, createdBy: userId }).sort({ createdAt: -1 }).lean();
         return await transformTask(tasks);
     },

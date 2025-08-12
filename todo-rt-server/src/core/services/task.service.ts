@@ -110,7 +110,7 @@ export const TaskService = {
     /**
      * Get tasks by priority
      */
-    findByPriority: async (priority: "low" | "med" | "high"): Promise<TaskDoc[]> => {
+    findByPriority: async (priority: "low" | "medium" | "high"): Promise<TaskDoc[]> => {
         return TaskRepo.findByPriority(priority);
     },
 

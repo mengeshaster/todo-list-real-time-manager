@@ -1,4 +1,5 @@
-<div class="task-item" [class.task-item--completed]="isCompleted" [class.task-item--locked]="isLocked">
+<div class="task-item" [class.task-item--completed]="isCompleted" [class.task-item--locked]="isLocked"
+  [class.task-item--overdue]="isOverdue">
   <div class="task-item__content">
     <div class="task-item__checkbox">
       <input title="." type="checkbox" [checked]="isCompleted" (change)="onToggleComplete()" [id]="'task-' + task.id"
@@ -17,6 +18,12 @@
       <p *ngIf="task.description" class="task-item__description">
         {{ task.description }}
       </p>
+      <div class="task-item__priority-due">
+        <span class="task-item__priority">{{ priorityDisplay }}</span>
+        <span *ngIf="task.dueDate" class="task-item__due-date" [class.task-item__due-date--overdue]="isOverdue">
+          {{ formatDueDate(task.dueDate) }}
+        </span>
+      </div>
       <div class="task-item__meta">
         <span class="task-item__date">Created: {{ formatDate(task.createdAt) }}</span>
         <span *ngIf="task.updatedAt !== task.createdAt" class="task-item__date">

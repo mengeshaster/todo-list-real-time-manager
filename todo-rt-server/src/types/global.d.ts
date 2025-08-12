@@ -42,7 +42,7 @@ export interface PaginationParams {
 
 export interface TaskFilters {
     status?: "open" | "done";
-    priority?: "low" | "med" | "high";
+    priority?: "low" | "medium" | "high";
     search?: string;
     dueDate?: {
         from?: Date;

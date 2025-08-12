@@ -10,7 +10,8 @@ export interface Task {
   title: string;
   description?: string;
   status: 'open' | 'done';
-  priority: string;
+  priority: 'low' | 'medium' | 'high';
+  dueDate?: Date;
   lock: TaskLock;
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +22,8 @@ export interface Task {
 export interface CreateTaskRequest {
   title: string;
   description?: string;
+  priority?: 'low' | 'medium' | 'high';
+  dueDate?: Date;
   userId: string;
 }
 
@@ -29,4 +32,6 @@ export interface UpdateTaskRequest {
   title?: string;
   description?: string;
   status?: 'open' | 'done';
+  priority?: 'low' | 'medium' | 'high';
+  dueDate?: Date;
 }

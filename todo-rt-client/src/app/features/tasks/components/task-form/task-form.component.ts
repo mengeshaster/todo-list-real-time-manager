@@ -35,7 +35,9 @@ export class TaskFormComponent implements OnDestroy {
 
     this.taskForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(100)]],
-      description: ['', [Validators.maxLength(500)]]
+      description: ['', [Validators.maxLength(500)]],
+      priority: ['medium', [Validators.required]],
+      dueDate: ['']
     });
   }
 
@@ -61,7 +63,9 @@ export class TaskFormComponent implements OnDestroy {
         const updateData = {
           id: this.editingTaskId,
           title,
-          description
+          description,
+          priority: this.taskForm.value.priority,
+          dueDate: this.taskForm.value.dueDate ? new Date(this.taskForm.value.dueDate) : undefined
         };
 
         const updateSub = this.taskService.updateTask(updateData).subscribe({
@@ -97,6 +101,8 @@ export class TaskFormComponent implements OnDestroy {
         const taskData: CreateTaskRequest = {
           title,
           description,
+          priority: this.taskForm.value.priority,
+          dueDate: this.taskForm.value.dueDate ? new Date(this.taskForm.value.dueDate) : undefined,
           userId: this.currentUser?.id || ''
         };
 
@@ -139,6 +145,14 @@ export class TaskFormComponent implements OnDestroy {
     return this.taskForm.get('description');
   }
 
+  get priorityControl() {
+    return this.taskForm.get('priority');
+  }
+
+  get dueDateControl() {
+    return this.taskForm.get('dueDate');
+  }
+
   getTitleError(): string {
     const control = this.titleControl;
 
@@ -176,9 +190,13 @@ export class TaskFormComponent implements OnDestroy {
 
     this.editingTaskId = task.id;
 
+    const dueDateValue = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '';
+
     this.taskForm.patchValue({
       title: task.title,
-      description: task.description || ''
+      description: task.description || '',
+      priority: task.priority || 'medium',
+      dueDate: dueDateValue
     });
 
     this.socketService.lockTask(task.id, this.currentUser?.name || '');

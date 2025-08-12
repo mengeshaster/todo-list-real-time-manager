@@ -61,7 +61,48 @@ export class TaskItemComponent {
     }
   }
 
+  get isOverdue(): boolean {
+    if (!this.task.dueDate || this.isCompleted) {
+      return false;
+    }
+
+    const today = new Date();
+    const dueDate = new Date(this.task.dueDate);
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  }
+
+  get priorityDisplay(): string {
+    const priorityMap = {
+      low: '🟢 Low',
+      medium: '🟡 Medium',
+      high: '🔴 High'
+    };
+
+    return priorityMap[this.task.priority] || this.task.priority;
+  }
+
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString();
+  }
+
+  formatDueDate(date: Date): string {
+    const dueDate = new Date(date);
+    const today = new Date();
+    const diffTime = dueDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return 'Due today';
+    } else if (diffDays === 1) {
+      return 'Due tomorrow';
+    } else if (diffDays === -1) {
+      return 'Due yesterday';
+    } else if (diffDays > 0) {
+      return `Due in ${diffDays} days`;
+    } else {
+      return `Overdue by ${Math.abs(diffDays)} days`;
+    }
   }
 }

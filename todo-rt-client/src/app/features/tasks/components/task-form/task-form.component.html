@@ -26,6 +26,25 @@
       </div>
     </div>
 
+    <div class="task-form__field">
+      <label for="priority" class="task-form__label">
+        Priority <span class="task-form__required">*</span>
+      </label>
+      <select id="priority" formControlName="priority" class="task-form__select">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+
+    <div class="task-form__field">
+      <label for="dueDate" class="task-form__label">
+        Due Date
+      </label>
+      <input id="dueDate" type="date" formControlName="dueDate" class="task-form__input"
+        placeholder="Select due date (optional)">
+    </div>
+
     <div class="task-form__actions">
       <button type="submit" class="task-form__submit" [disabled]="taskForm.invalid || isSubmitting"
         [class.task-form__submit--loading]="isSubmitting">

@@ -160,7 +160,7 @@ export const TaskController = {
         try {
             const { priority } = req.params;
 
-            if (priority !== "low" && priority !== "med" && priority !== "high") {
+            if (priority !== "low" && priority !== "medium" && priority !== "high") {
                 res.status(400).json({ error: "Invalid priority. Must be 'low', 'med', or 'high'" });
                 return;
             }

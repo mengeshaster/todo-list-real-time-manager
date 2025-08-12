@@ -56,6 +56,26 @@
     min-height: 80px;
   }
 
+  &__select {
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #2196f3;
+    }
+
+    &:hover {
+      border-color: #bdbdbd;
+    }
+  }
+
   &__error {
     color: #c62828;
     font-size: 0.8rem;

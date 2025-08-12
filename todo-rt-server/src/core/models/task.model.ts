@@ -10,7 +10,7 @@ interface ITask extends Document {
     title: string;
     description?: string;
     status: "open" | "done";
-    priority: "low" | "med" | "high";
+    priority: "low" | "medium" | "high";
     dueDate?: Date;
     lock: ILock;
     createdBy: Types.ObjectId;
@@ -36,8 +36,8 @@ const TaskSchema = new Schema<ITask>(
         },
         priority: {
             type: String,
-            enum: ["low", "med", "high"],
-            default: "med"
+            enum: ["low", "medium", "high"],
+            default: "medium"
         },
         dueDate: { type: Date },
         lock: {

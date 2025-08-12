@@ -1,6 +1,21 @@
 <div class="task-list">
   <div class="task-list__header">
     <h2>Tasks</h2>
+    <div class="task-list__sort-controls">
+      <span class="task-list__sort-label">Sort by:</span>
+      <button class="task-list__sort-btn" [class.task-list__sort-btn--active]="sortBy === 'priority'"
+        (click)="onSortChange('priority')">
+        Priority {{ getSortIcon('priority') }}
+      </button>
+      <button class="task-list__sort-btn" [class.task-list__sort-btn--active]="sortBy === 'dueDate'"
+        (click)="onSortChange('dueDate')">
+        Due Date {{ getSortIcon('dueDate') }}
+      </button>
+      <button class="task-list__sort-btn" [class.task-list__sort-btn--active]="sortBy === 'created'"
+        (click)="onSortChange('created')">
+        Created {{ getSortIcon('created') }}
+      </button>
+    </div>
     <div *ngIf="loading$ | async" class="task-list__loading">
       Loading tasks...
     </div>

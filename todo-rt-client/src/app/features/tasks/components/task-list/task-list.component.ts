@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, map } from 'rxjs';
 import { Task } from '../../../../core/models/task.model';
 import { TaskService } from '../../../../core/services/task.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -24,6 +24,9 @@ export class TaskListComponent implements OnInit, OnDestroy {
   error$: Observable<string | null>;
   private currentUserId: User | null = null;
 
+  sortBy: 'priority' | 'dueDate' | 'created' = 'created';
+  sortOrder: 'asc' | 'desc' = 'desc';
+
   private subscriptions = new Subscription();
 
   onTaskEdit(task: Task): void {
@@ -45,7 +48,9 @@ export class TaskListComponent implements OnInit, OnDestroy {
     private taskStore: TaskStore,
     private authService: AuthService
   ) {
-    this.tasks$ = this.taskStore.getTasks();
+    this.tasks$ = this.taskStore.getTasks().pipe(
+      map(tasks => this.sortTasks(tasks))
+    );
     this.loading$ = this.taskStore.getLoading();
     this.error$ = this.taskStore.getError();
     this.currentUserId = this.authService.getCurrentUser();
@@ -175,5 +180,48 @@ export class TaskListComponent implements OnInit, OnDestroy {
     });
 
     this.subscriptions.add(deleteSub);
+  }
+
+  onSortChange(sortBy: 'priority' | 'dueDate' | 'created'): void {
+    if (this.sortBy === sortBy) {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = sortBy;
+      this.sortOrder = sortBy === 'dueDate' ? 'asc' : 'desc';
+    }
+
+    this.tasks$ = this.taskStore.getTasks().pipe(
+      map(tasks => this.sortTasks(tasks))
+    );
+  }
+
+  private sortTasks(tasks: Task[]): Task[] {
+    return [...tasks].sort((a, b) => {
+      let comparison = 0;
+
+      switch (this.sortBy) {
+        case 'priority':
+          const priorityOrder = { high: 3, medium: 2, low: 1 };
+          comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
+          break;
+        case 'dueDate':
+          const aDate = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
+          const bDate = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER;
+          comparison = aDate - bDate;
+          break;
+        case 'created':
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          break;
+      }
+
+      return this.sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }
+
+  getSortIcon(sortType: 'priority' | 'dueDate' | 'created'): string {
+    if (this.sortBy !== sortType) {
+      return '↕️';
+    }
+    return this.sortOrder === 'asc' ? '↑' : '↓';
   }
 }

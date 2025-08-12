@@ -117,7 +117,7 @@ interface ITask extends Document {
     title: string;
     description?: string;
     status: "open" | "done";
-    priority: "low" | "med" | "high";
+    priority: "low" | "medium" | "high";
     dueDate?: Date;
     lock: ILock;
     createdBy: Types.ObjectId;
@@ -137,8 +137,8 @@ const TaskSchema = new Schema<ITask>(
         },
         priority: {
             type: String,
-            enum: ["low", "med", "high"],
-            default: "med"
+            enum: ["low", "medium", "high"],
+            default: "medium"
         },
         dueDate: { type: Date },
         lock: {
@@ -149,7 +149,7 @@ const TaskSchema = new Schema<ITask>(
         updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     },
     {
-        timestamps: true, // Automatically adds createdAt and updatedAt
+        timestamps: true,
         toJSON: {
             transform: function (doc: any, ret: any) {
                 ret.id = ret._id;
@@ -215,7 +215,7 @@ const UserSchema = new Schema<IUser>(
                 ret.id = ret._id;
                 delete ret._id;
                 delete ret.__v;
-                delete ret.passwordHash; // Security: Never expose password hash
+                delete ret.passwordHash;
                 return ret;
             }
         }
@@ -327,13 +327,12 @@ User.updateOne({ _id: userId }, { lastLogin: new Date() });
 
 - `task:lock` - Request to lock a task for editing
 - `task:unlock` - Release lock on a task
-- `subscribe` - Join task-specific rooms (future enhancement)
 
 ### Server → Client Events
 
-- `task:add` - New task created
-- `task:update` - Task modified
-- `task:delete` - Task deleted
+- `task:created` - New task created
+- `task:updated` - Task modified
+- `task:deleted` - Task deleted
 - `task:lock` - Task locked by a user
 - `task:unlock` - Task unlocked
 - `error` - Error occurred
@@ -367,7 +366,7 @@ User.updateOne({ _id: userId }, { lastLogin: new Date() });
 1. **Clone the repository**
 
    ```bash
-   git clone <[repository-url](https://github.com/mengeshaster/todo-list-real-time-manager.git)>
+   git clone https://github.com/mengeshaster/todo-list-real-time-manager.git
    cd todo-rt
    ```
 
