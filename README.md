@@ -102,47 +102,224 @@ User A clicks "Edit" → emit("task:lock", taskId) → Lock Manager → MongoDB
 
 ## 🗄️ Data Model
 
+The application uses MongoDB as the primary database with Mongoose ODM for schema definition and validation. The data model consists of two main collections: Tasks and Users, with an embedded lock system for collaborative editing.
+
 ### Task Schema
 
 ```typescript
-interface Task {
-  _id: ObjectId;
-  title: string;
-  description: string;
-  status: 'open' | 'done';
-  priority?: 'low' | 'medium' | 'high';
-  dueDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: ObjectId; // User reference
-  updatedBy: ObjectId; // User reference
-  lock?: LockInfo;     // Embedded lock information
+interface ILock {
+    isLocked: boolean;
+    lockedBy?: Types.ObjectId;
+    lockedAt?: Date;
 }
+
+interface ITask extends Document {
+    title: string;
+    description?: string;
+    status: "open" | "done";
+    priority: "low" | "med" | "high";
+    dueDate?: Date;
+    lock: ILock;
+    createdBy: Types.ObjectId;
+    updatedBy?: Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const TaskSchema = new Schema<ITask>(
+    {
+        title: { type: String, required: true, trim: true, maxlength: 200 },
+        description: { type: String, trim: true, maxlength: 1000 },
+        status: {
+            type: String,
+            enum: ["open", "done"],
+            default: "open"
+        },
+        priority: {
+            type: String,
+            enum: ["low", "med", "high"],
+            default: "med"
+        },
+        dueDate: { type: Date },
+        lock: {
+            type: LockSchema,
+            default: () => ({ isLocked: false })
+        },
+        createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    },
+    {
+        timestamps: true, // Automatically adds createdAt and updatedAt
+        toJSON: {
+            transform: function (doc: any, ret: any) {
+                ret.id = ret._id;
+                delete ret._id;
+                delete ret.__v;
+                return ret;
+            }
+        }
+    }
+);
 ```
 
-### Lock Schema
+### Lock Schema (Embedded)
 
 ```typescript
-interface LockInfo {
-  isLocked: boolean;
-  lockedBy: ObjectId;  // User reference
-  lockedAt: Date;
-  ttlSec?: number;     // Time-to-live in seconds
-}
+const LockSchema = new Schema<ILock>({
+    isLocked: { type: Boolean, default: false },
+    lockedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    lockedAt: { type: Date },
+});
 ```
 
 ### User Schema
 
 ```typescript
-interface User {
-  _id: ObjectId;
-  email: string;       // Unique, normalized to lowercase
-  passwordHash: string; // bcrypt/argon2 hash
-  name: string;
-  createdAt: Date;
-  lastLogin: Date;
+interface IUser extends Document {
+    _id: string;
+    email: string;
+    name: string;
+    passwordHash: string;
+    createdAt: Date;
+    lastLogin?: Date;
 }
+
+const UserSchema = new Schema<IUser>(
+    {
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true,
+            maxlength: 255
+        },
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 100
+        },
+        passwordHash: {
+            type: String,
+            required: true
+        },
+        lastLogin: {
+            type: Date
+        }
+    },
+    {
+        timestamps: true,
+        toJSON: {
+            transform: function (doc: any, ret: any) {
+                ret.id = ret._id;
+                delete ret._id;
+                delete ret.__v;
+                delete ret.passwordHash; // Security: Never expose password hash
+                return ret;
+            }
+        }
+    }
+);
 ```
+
+### Database Indexes
+
+For optimal query performance, the following indexes are implemented:
+
+#### Task Collection Indexes
+
+```typescript
+TaskSchema.index({ status: 1 });                    // Filter by status
+TaskSchema.index({ priority: 1 });                  // Filter by priority  
+TaskSchema.index({ createdAt: -1 });                // Sort by creation date (newest first)
+TaskSchema.index({ createdBy: 1 });                 // Filter by creator
+TaskSchema.index({ "lock.isLocked": 1, "lock.lockedBy": 1 }); // Lock queries
+```
+
+#### User Collection Indexes
+
+```typescript
+UserSchema.index({ email: 1 }); // Unique email lookup for authentication
+```
+
+### Database Design Principles
+
+#### 1. **Embedded vs Referenced Data**
+
+- **Lock Information**: Embedded within tasks for atomic operations and consistency
+- **User References**: Referenced by ObjectId to avoid data duplication and maintain referential integrity
+
+#### 2. **Schema Validation**
+
+- **String Limits**: Title (200 chars), description (1000 chars), name (100 chars), email (255 chars)
+- **Enums**: Status (`open`, `done`) and priority (`low`, `med`, `high`) with controlled vocabularies
+- **Required Fields**: Essential fields marked as required with appropriate defaults
+
+#### 3. **Security Considerations**
+
+- **Password Security**: Passwords are hashed (never stored in plain text)
+- **Data Sanitization**: Email normalized to lowercase, strings trimmed
+- **JSON Transform**: Password hash automatically excluded from API responses
+
+#### 4. **Audit Trail**
+
+- **Timestamps**: Automatic `createdAt` and `updatedAt` tracking
+- **User Tracking**: `createdBy` and `updatedBy` for accountability
+- **Last Login**: User activity tracking
+
+#### 5. **Real-time Collaboration**
+
+- **Lock System**: Embedded lock prevents concurrent editing conflicts
+- **Lock Metadata**: Tracks who locked the task and when
+- **Atomic Updates**: Lock state changes are atomic within task updates
+
+### Query Patterns
+
+#### Common Task Queries
+
+```typescript
+// Get user's tasks
+Task.find({ createdBy: userId }).sort({ createdAt: -1 });
+
+// Get locked tasks
+Task.find({ "lock.isLocked": true });
+
+// Get tasks by status and priority
+Task.find({ status: "open", priority: "high" });
+
+// Check if task is locked by specific user
+Task.findOne({ _id: taskId, "lock.lockedBy": userId });
+```
+
+#### User Authentication Queries
+
+```typescript
+// Login lookup
+User.findOne({ email: email.toLowerCase() });
+
+// Update last login
+User.updateOne({ _id: userId }, { lastLogin: new Date() });
+```
+
+### Data Consistency
+
+#### 1. **Referential Integrity**
+
+- User references in tasks are validated
+- Orphaned tasks are handled gracefully when users are deleted
+
+#### 2. **Lock Consistency**
+
+- Lock state is managed atomically with task updates
+- TTL (Time-To-Live) cleanup prevents stale locks
+- Lock acquisition uses optimistic concurrency control
+
+#### 3. **Transaction Support**
+
+- Critical operations use MongoDB transactions when needed
+- Lock acquisition and task updates are atomic
+- Rollback capability for failed multi-step operations
 
 ## 🔌 Socket.IO Events
 
