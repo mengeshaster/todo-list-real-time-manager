@@ -1,0 +1,23 @@
+<div class="task-list">
+  <div class="task-list__header">
+    <h2>Tasks</h2>
+    <div *ngIf="loading$ | async" class="task-list__loading">
+      Loading tasks...
+    </div>
+  </div>
+
+  <div *ngIf="error$ | async as error" class="task-list__error">
+    {{ error }}
+  </div>
+
+  <div class="task-list__content">
+    <div *ngIf="(tasks$ | async)?.length === 0 && !(loading$ | async)" class="task-list__empty">
+      <p>No tasks yet. Create your first task above!</p>
+    </div>
+
+    <div *ngFor="let task of tasks$ | async" class="task-list__item">
+      <app-task-item [task]="task" (toggle)="onTaskToggle($event)" (delete)="onTaskDelete($event)"
+        (edit)="onTaskEdit($event)"></app-task-item>
+    </div>
+  </div>
+</div>

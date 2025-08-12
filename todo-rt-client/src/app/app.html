@@ -1,0 +1,17 @@
+@if (isAuthenticated$ | async) {
+<header class="app-header">
+  <div class="header-content">
+    <h1>Todo Real-Time</h1>
+    <div class="user-menu">
+      @if (currentUser$ | async; as user) {
+      <span class="user-name">{{ user.name }}</span>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+      }
+    </div>
+  </div>
+</header>
+}
+
+<main class="app-main">
+  <router-outlet></router-outlet>
+</main>

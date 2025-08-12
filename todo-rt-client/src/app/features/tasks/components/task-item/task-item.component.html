@@ -1,0 +1,42 @@
+<div class="task-item" [class.task-item--completed]="isCompleted" [class.task-item--locked]="isLocked">
+  <div class="task-item__content">
+    <div class="task-item__checkbox">
+      <input title="." type="checkbox" [checked]="isCompleted" (change)="onToggleComplete()" [id]="'task-' + task.id"
+        [disabled]="isLocked" [attr.aria-label]="'Toggle completion for task: ' + task.title"
+        [attr.title]="isLocked ? 'Cannot toggle while being edited' : 'Toggle completion for task: ' + task.title">
+      <label [for]="'task-' + task.id" class="task-item__checkmark"></label>
+    </div>
+
+    <div class="task-item__details">
+      <h3 class="task-item__title" [class.task-item__title--completed]="isCompleted">
+        {{ task.title }}
+        <span *ngIf="isLocked" class="task-item__lock-indicator" title="Task is being edited by {{ lockedBy }}">
+          🔒
+        </span>
+      </h3>
+      <p *ngIf="task.description" class="task-item__description">
+        {{ task.description }}
+      </p>
+      <div class="task-item__meta">
+        <span class="task-item__date">Created: {{ formatDate(task.createdAt) }}</span>
+        <span *ngIf="task.updatedAt !== task.createdAt" class="task-item__date">
+          Updated: {{ formatDate(task.updatedAt) }}
+        </span>
+        <span *ngIf="isLocked" class="task-item__lock-status">
+          Being edited by {{ lockedBy }}
+        </span>
+      </div>
+    </div>
+
+    <div class="task-item__actions">
+      <button class="task-item__edit-btn" (click)="onEdit()" [disabled]="isLocked"
+        [title]="isLocked ? 'Task is being edited by ' + lockedBy : 'Edit task'">
+        ✎
+      </button>
+      <button class="task-item__delete-btn" (click)="onDelete()" [disabled]="isLocked"
+        [title]="isLocked ? 'Cannot delete while being edited' : 'Delete task'">
+        ✕
+      </button>
+    </div>
+  </div>
+</div>

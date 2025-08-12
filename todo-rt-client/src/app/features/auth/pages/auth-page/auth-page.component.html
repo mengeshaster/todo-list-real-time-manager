@@ -1,0 +1,37 @@
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-header">
+      <h1>Todo Real-Time</h1>
+      <p>Manage your tasks in real-time</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="tab-button" [class.active]="activeTab() === 'login'" (click)="switchTab('login')">
+        Sign In
+      </button>
+      <button class="tab-button" [class.active]="activeTab() === 'register'" (click)="switchTab('register')">
+        Sign Up
+      </button>
+    </div>
+
+    <div class="auth-content">
+      @if (activeTab() === 'login') {
+      <app-login-form></app-login-form>
+      } @else {
+      <app-register-form></app-register-form>
+      }
+    </div>
+
+    <div class="auth-footer">
+      @if (activeTab() === 'login') {
+      <p>Don't have an account?
+        <button class="link-button" (click)="switchTab('register')">Sign up here</button>
+      </p>
+      } @else {
+      <p>Already have an account?
+        <button class="link-button" (click)="switchTab('login')">Sign in here</button>
+      </p>
+      }
+    </div>
+  </div>
+</div>

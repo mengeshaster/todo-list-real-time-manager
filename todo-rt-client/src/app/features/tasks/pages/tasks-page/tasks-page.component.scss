@@ -1,0 +1,54 @@
+.tasks-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  &__header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  &__form {
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  &__list {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 768px) {
+  .tasks-page {
+    padding: 1rem;
+
+    &__content {
+      gap: 1rem;
+    }
+
+    &__form {
+      padding: 1rem;
+    }
+  }
+}

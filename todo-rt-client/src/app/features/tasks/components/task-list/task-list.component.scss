@@ -1,0 +1,56 @@
+.task-list {
+  &__header {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      margin: 0;
+      color: #333;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__loading {
+    color: #666;
+    font-style: italic;
+  }
+
+  &__error {
+    background: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    border-left: 4px solid #c62828;
+    margin: 1rem;
+    border-radius: 4px;
+  }
+
+  &__content {
+    min-height: 200px;
+  }
+
+  &__empty {
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+
+    p {
+      margin: 0;
+      font-style: italic;
+    }
+  }
+
+  &__item {
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #fafafa;
+    }
+  }
+}

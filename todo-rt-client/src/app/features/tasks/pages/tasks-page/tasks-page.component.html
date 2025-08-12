@@ -1,0 +1,16 @@
+<div class="tasks-page">
+    <div class="tasks-page__header">
+        <h1>Todo Tasks</h1>
+        <p>Manage your tasks in real-time</p>
+    </div>
+
+    <div class="tasks-page__content">
+        <div class="tasks-page__form">
+            <app-task-form #taskFormRef></app-task-form>
+        </div>
+
+        <div class="tasks-page__list">
+            <app-task-list [taskFormComponent]="taskFormRef"></app-task-list>
+        </div>
+    </div>
+</div>

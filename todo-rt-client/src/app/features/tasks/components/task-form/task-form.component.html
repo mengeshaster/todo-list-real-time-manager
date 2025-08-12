@@ -1,0 +1,40 @@
+<div class="task-form">
+  <h2 class="task-form__title">{{ editingTaskId ? 'Edit Task' : 'Create New Task' }}</h2>
+
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="task-form__form">
+    <div class="task-form__field">
+      <label for="title" class="task-form__label">
+        Title <span class="task-form__required">*</span>
+      </label>
+      <input id="title" type="text" formControlName="title" class="task-form__input"
+        [class.task-form__input--error]="getTitleError()" placeholder="Enter task title..." maxlength="100">
+      <div *ngIf="getTitleError()" class="task-form__error">
+        {{ getTitleError() }}
+      </div>
+    </div>
+
+    <div class="task-form__field">
+      <label for="description" class="task-form__label">
+        Description
+      </label>
+      <textarea id="description" formControlName="description" class="task-form__textarea"
+        [class.task-form__textarea--error]="getDescriptionError()" placeholder="Enter task description (optional)..."
+        rows="3" maxlength="500">
+      </textarea>
+      <div *ngIf="getDescriptionError()" class="task-form__error">
+        {{ getDescriptionError() }}
+      </div>
+    </div>
+
+    <div class="task-form__actions">
+      <button type="submit" class="task-form__submit" [disabled]="taskForm.invalid || isSubmitting"
+        [class.task-form__submit--loading]="isSubmitting">
+        {{ isSubmitting ? (editingTaskId ? 'Saving...' : 'Creating...') : (editingTaskId ? 'Save Changes' :
+        'Create Task') }}
+      </button>
+      <button *ngIf="editingTaskId" type="button" class="task-form__cancel task-form__button" (click)="onCancel()">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
