@@ -92,8 +92,6 @@ User A clicks "Edit" → emit("task:lock", taskId) → Lock Manager → MongoDB
                                                Check if already locked
                                                         ↓
                                             Grant lock → emit("task:lock")
-                                                    OR
-                                            Deny lock → emit("task:lockDenied")
 ```
 
 ### 3. Real-time Synchronization
@@ -161,7 +159,6 @@ interface User {
 - `task:delete` - Task deleted
 - `task:lock` - Task locked by a user
 - `task:unlock` - Task unlocked
-- `task:lockDenied` - Lock request denied (already locked)
 - `error` - Error occurred
 
 ## 🛡️ Security & Authentication
@@ -193,7 +190,7 @@ interface User {
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone <[repository-url](https://github.com/mengeshaster/todo-list-real-time-manager.git)>
    cd todo-rt
    ```
 

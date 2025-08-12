@@ -55,26 +55,19 @@ export class SocketService {
     this.socket.on('connect_error', (error) => {
       console.error('🔥 Socket connection error:', error);
 
-      // Check if the error is related to authentication
       if (error.message && (
-        error.message.includes('Authentication failed') ||
-        error.message.includes('Unauthorized') ||
-        error.message.includes('Invalid token')
+        error.message.includes('Authentication error') ||
+        error.message.includes('No token provided') ||
+        error.message.includes('Invalid or expired token') ||
+        error.message.includes('Internal server error')
       )) {
         console.log('🚫 WebSocket authentication failed, logging out user');
         this.handleAuthError();
       }
     });
 
-    // Listen for authentication error events from server
     this.socket.on('auth_error', (error) => {
       console.error('🚫 WebSocket auth error:', error);
-      this.handleAuthError();
-    });
-
-    // Listen for token expiration events from server
-    this.socket.on('token_expired', () => {
-      console.error('🚫 WebSocket token expired');
       this.handleAuthError();
     });
   }
@@ -82,7 +75,6 @@ export class SocketService {
   private handleAuthError(): void {
     console.log('🚫 Handling WebSocket authentication error');
 
-    // Clear local auth data immediately (don't make HTTP logout request)
     this.authService.clearAuthData();
     this.router.navigate(['/auth']);
   }
